@@ -4,7 +4,8 @@ from pyatspi.state import STATE_VISIBLE, STATE_SHOWING
 
 from tkinter import Tk, BOTH, Frame
 from tkinter.ttk import Label, Style
-
+from math import log, ceil
+import itertools
 
 class ClickableUiElement:
 	def __init__(self, x, y, width, height, label):
@@ -48,6 +49,19 @@ for app in desktop:
 			print(f"{window.name}: position: ({window_position.x},{window_position.y}), size: ({window_size.x}, {window_size.y})")
 
 			results = find_children(window)
+
+results_count = len(results)
+char_count = 26
+#necessary_chars = ceil(log(results_count) / log(char_count))
+necessary_chars = 2
+char_sets = [ [ chr(char + 65) for char in range(char_count) ] for _ in range(necessary_chars) ]
+char_combinations = itertools.product(*char_sets)
+captions = [ "".join(combination) for combination in char_combinations ]
+print(captions)
+
+for result, caption in zip(results, captions):
+	result.label = caption
+
 
 if window_position is None or window_size is None:
 	print("No active window found.")
