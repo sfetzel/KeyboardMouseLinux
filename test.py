@@ -22,8 +22,16 @@ class ClickableUiElement:
 
 desktop = pyatspi.Registry.getDesktop(0)
 visible_roles = ["push button", "toggle button"]
+max_depth = 10
+
+def has_actions(element):
+	try:
+		return element.queryAction().nActions > 0
+	except:
+		return False
+
 def find_children(element, depth=1):
-	if depth > 4:
+	if depth > max_depth:
 		return []
 
 	results = []
@@ -35,7 +43,7 @@ def find_children(element, depth=1):
 			role_name = m.getRoleName()
 			states = m.getState().getStates()
 
-			if STATE_VISIBLE in states and STATE_SHOWING in states and role_name in visible_roles:
+			if STATE_VISIBLE in states and STATE_SHOWING in states and has_actions(m):
 				print(f"position: ({point.x},{point.y}), size: ({size.x}, {size.y})")
 				print(m)
 				results.append(ClickableUiElement(point.x, point.y, size.x, size.y, role_name, m))
@@ -68,6 +76,7 @@ for app in desktop:
 			print(f"{window.name}: position: ({window_position.x},{window_position.y}), size: ({window_size.x}, {window_size.y})")
 			active_app = app
 			results = find_children(window)
+			break
 
 results_count = len(results)
 char_count = 26
